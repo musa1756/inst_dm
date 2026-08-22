@@ -5,7 +5,7 @@
 ## Что понадобится
 
 - Instagram Professional Account: **Creator** или **Business**;
-- отдельный VPS за пределами РФ с Ubuntu 24.04 LTS;
+- отдельный VPS за пределами РФ с Ubuntu 24.04 LTS или Ubuntu 26.04 LTS;
 - минимум 2 vCPU, 2 ГБ RAM и 30 ГБ диска;
 - собственный домен или поддомен;
 - доступ `root` к консоли сервера;
@@ -17,7 +17,7 @@ Facebook Page для сценария **Instagram API with Instagram Login** н�
 
 При создании VPS выберите:
 
-- операционная система: `Ubuntu 24.04 LTS`;
+- операционная система: `Ubuntu 24.04 LTS` или `Ubuntu 26.04 LTS`;
 - зарубежный регион, где Instagram и Meta API доступны;
 - один публичный IPv4-адрес.
 
@@ -62,7 +62,7 @@ nslookup dm.example.com
 
 ```bash
 apt update && apt install -y git
-git clone --depth 1 --branch v0.1.0 https://github.com/musa1756/inst_dm.git /tmp/inst_dm
+git clone --depth 1 --branch v0.1.1 https://github.com/musa1756/inst_dm.git /tmp/inst_dm
 cd /tmp/inst_dm
 sudo bash scripts/install-vps.sh dm.example.com 203.0.113.10
 ```
@@ -247,7 +247,7 @@ sudo /opt/inst_dm/scripts/doctor.sh
 Установки пользователей не обновляются автоматически от push разработчика. После объявления новой проверенной версии запустите команду с её тегом, например:
 
 ```bash
-sudo /opt/inst_dm/scripts/update-vps.sh v0.1.0
+sudo /opt/inst_dm/scripts/update-vps.sh v0.1.1
 ```
 
 Перед обновлением автоматически создаётся backup. Новая версия собирается отдельно и заменяет работающую только после успешной проверки `/ready`; при ошибке возвращается предыдущий Docker-образ.

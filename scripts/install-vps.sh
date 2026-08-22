@@ -23,9 +23,13 @@ fi
 
 # shellcheck disable=SC1091
 source /etc/os-release
-if [[ "${ID:-}" != "ubuntu" || "${VERSION_ID:-}" != "24.04" ]]; then
-  fail "первая публичная версия установщика поддерживает только Ubuntu 24.04 LTS"
+if [[ "${ID:-}" != "ubuntu" ]]; then
+  fail "установщик поддерживает только Ubuntu Server"
 fi
+case "${VERSION_ID:-}" in
+  24.04|26.04) ;;
+  *) fail "установщик поддерживает Ubuntu 24.04 LTS и Ubuntu 26.04 LTS" ;;
+esac
 
 if [[ -f "$PROJECT_DIR/.env" ]]; then
   fail "в $PROJECT_DIR уже есть установка. Скрипт не перезаписывает рабочие данные"

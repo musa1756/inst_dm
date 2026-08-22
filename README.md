@@ -7,13 +7,13 @@
 
 Всё принадлежит владельцу установки: домен, VPS, Meta-приложение, база и секреты. Проект не просит пароль Instagram, не отправляет данные разработчику и использует только официальный Instagram API with Instagram Login.
 
-> Версия `0.1.0` основана на проверенном открытом проекте [xvn3x/comment-to-dm](https://github.com/xvn3x/comment-to-dm) по MIT-лицензии и адаптирована под полностью самостоятельную установку. Перед важным аккаунтом проверьте сценарий на тестовой публикации.
+> Версия `0.1.1` основана на проверенном открытом проекте [xvn3x/comment-to-dm](https://github.com/xvn3x/comment-to-dm) по MIT-лицензии и адаптирована под полностью самостоятельную установку. Перед важным аккаунтом проверьте сценарий на тестовой публикации.
 
 ## Что понадобится
 
 - собственный домен или поддомен, например `dm.example.com`;
 - зарубежный VPS в регионе, где доступны Instagram и Meta API;
-- Ubuntu 24.04 LTS, 2 vCPU, 2 ГБ RAM, 30 ГБ диска и публичный IPv4;
+- Ubuntu 24.04 LTS или Ubuntu 26.04 LTS, 2 vCPU, 2 ГБ RAM, 30 ГБ диска и публичный IPv4;
 - Instagram Professional Account: Creator или Business;
 - собственное приложение в Meta for Developers;
 - примерно 40–60 минут на первую настройку.
@@ -41,7 +41,7 @@ Facebook Page для используемого здесь потока Instagra
 
 ### 1. Подготовьте VPS и домен
 
-Создайте VPS с Ubuntu 24.04 LTS в зарубежном регионе. В firewall провайдера разрешите SSH, TCP `80` и TCP `443`.
+Создайте VPS с Ubuntu 24.04 LTS или Ubuntu 26.04 LTS в зарубежном регионе. В firewall провайдера разрешите SSH, TCP `80` и TCP `443`.
 
 У регистратора домена создайте DNS-запись:
 
@@ -60,7 +60,7 @@ Facebook Page для используемого здесь потока Instagra
 ```bash
 sudo apt update
 sudo apt install -y git
-git clone --depth 1 --branch v0.1.0 https://github.com/musa1756/inst_dm.git /tmp/inst_dm
+git clone --depth 1 --branch v0.1.1 https://github.com/musa1756/inst_dm.git /tmp/inst_dm
 cd /tmp/inst_dm
 sudo bash scripts/install-vps.sh dm.example.com 203.0.113.10
 ```
@@ -134,7 +134,7 @@ sudo INSTDM_RESTORE_CONFIRM=RESTORE_INST_DM \
 Обновление выполняется только на явно выбранный релизный тег. Перед заменой версии автоматически создаётся backup, а при неуспешном `/ready` приложение откатывается:
 
 ```bash
-sudo /opt/inst_dm/scripts/update-vps.sh v0.1.0
+sudo /opt/inst_dm/scripts/update-vps.sh v0.1.1
 ```
 
 Копии в `/var/backups/inst_dm` содержат базу и production-секреты. Не публикуйте их и периодически храните свежую копию отдельно от VPS в зашифрованном виде.

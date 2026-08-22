@@ -54,6 +54,7 @@ test("new VPS installations enable security updates and provide an SSH key-only 
   const sshPolicy = projectFile("deploy/ssh/99-inst_dm-hardening.conf");
   assert.match(installer, /unattended-upgrades/);
   assert.match(installer, /apt-daily-upgrade\.timer/);
+  assert.match(installer, /24\.04\|26\.04/);
   assert.match(installer, /chmod 644 "\$PROJECT_DIR\/Caddyfile"/);
   assert.match(sshPolicy, /PasswordAuthentication no/);
   assert.match(sshPolicy, /KbdInteractiveAuthentication no/);
@@ -73,5 +74,6 @@ test("domain-only installation docs and release version stay aligned", () => {
   assert.match(installer, /A-запись .* ожидается IP этого VPS/);
   for (const document of [readme, installRu, aiInstall]) {
     assert.match(document, new RegExp(`v${packageVersion.replaceAll(".", "\\.")}`));
+    assert.match(document, /Ubuntu 24\.04[\s\S]*Ubuntu 26\.04/);
   }
 });

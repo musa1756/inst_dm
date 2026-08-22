@@ -4,7 +4,7 @@ This document is written for Codex, Claude Code, and other coding agents. The hu
 
 ## Target result
 
-A single-owner installation on a foreign Ubuntu 24.04 VPS:
+A single-owner installation on a foreign Ubuntu 24.04 or Ubuntu 26.04 LTS VPS:
 
 - a custom domain owned by the operator, with an A record pointing to the VPS;
 - application and embedded worker in Docker;
@@ -41,7 +41,7 @@ Establish these facts without requesting secrets:
 
 1. The VPS belongs to the human and is intended for this installation.
 2. Region is outside a jurisdiction/network where Meta is blocked.
-3. OS is Ubuntu 24.04 LTS.
+3. OS is Ubuntu 24.04 LTS or Ubuntu 26.04 LTS.
 4. Resources are at least 2 vCPU, 2 GB RAM, 30 GB disk, one public IPv4.
 5. The human can open the provider console or already has an SSH session.
 6. Provider firewall allows the existing SSH port plus TCP 80 and 443.
@@ -66,7 +66,7 @@ If the agent has an authorized terminal, perform these commands. Otherwise show 
 ```bash
 sudo apt update
 sudo apt install -y git
-git clone --depth 1 --branch v0.1.0 https://github.com/musa1756/inst_dm.git /tmp/inst_dm
+git clone --depth 1 --branch v0.1.1 https://github.com/musa1756/inst_dm.git /tmp/inst_dm
 cd /tmp/inst_dm
 sudo bash scripts/install-vps.sh dm.example.com 203.0.113.10
 ```
@@ -76,7 +76,7 @@ Replace `dm.example.com` with the human's own domain and `203.0.113.10` with tha
 The installer intentionally:
 
 - refuses to overwrite an existing installation;
-- installs Docker from Ubuntu 24.04 packages;
+- installs Docker from the selected supported Ubuntu LTS package repositories;
 - creates `/opt/inst_dm` and a dedicated non-login `instdm` service user; its Docker-group access is root-equivalent and is used only by the backup service;
 - generates independent admin, session, encryption, webhook, database secrets;
 - starts PostgreSQL, the application, worker, and Caddy;
