@@ -5,7 +5,7 @@ const schema = z.object({
   HOST: z.string().default("0.0.0.0"),
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   PUBLIC_BASE_URL: z.string().url().default("http://localhost:3000"),
-  DATABASE_URL: z.string().min(1).default("postgres://commentdm:commentdm@localhost:5432/commentdm"),
+  DATABASE_URL: z.string().min(1).default("postgres://instdm:instdm@localhost:5432/instdm"),
   ADMIN_PASSWORD: z.string().min(10).default("local-development-only"),
   SESSION_SECRET: z.string().min(32).default("local-session-secret-change-me-000000000000"),
   ENCRYPTION_KEY: z.string().min(43).default("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="),
@@ -56,7 +56,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       config.META_WEBHOOK_VERIFY_TOKEN.includes("replace-with"),
       !databaseUrl.username,
       databaseUrl.password.length < 16,
-      databaseUrl.password === "commentdm",
+      databaseUrl.password === "instdm",
       databaseUrl.password.includes("replace-with"),
     ];
     if (insecure.some(Boolean)) {

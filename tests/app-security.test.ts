@@ -10,7 +10,7 @@ test("production sessions use a host-only cookie, no-store responses and exact-o
   const config = loadConfig({
     NODE_ENV: "production",
     PUBLIC_BASE_URL: "https://comment.example.com",
-    DATABASE_URL: `postgres://commentdm:${randomBytes(24).toString("base64url")}@db:5432/commentdm`,
+    DATABASE_URL: `postgres://instdm:${randomBytes(24).toString("base64url")}@db:5432/instdm`,
     ADMIN_PASSWORD: password,
     SESSION_SECRET: randomBytes(48).toString("base64url"),
     ENCRYPTION_KEY: randomBytes(32).toString("base64"),
@@ -27,7 +27,7 @@ test("production sessions use a host-only cookie, no-store responses and exact-o
     assert.equal(login.statusCode, 200);
     assert.equal(login.headers["cache-control"], "no-store");
     const setCookie = String(login.headers["set-cookie"]);
-    assert.match(setCookie, /^__Host-commentdm_session=/);
+    assert.match(setCookie, /^__Host-instdm_session=/);
     assert.match(setCookie, /HttpOnly/i);
     assert.match(setCookie, /Secure/i);
     assert.match(setCookie, /SameSite=Strict/i);
@@ -64,7 +64,7 @@ test("production sessions use a host-only cookie, no-store responses and exact-o
       headers: { cookie: sessionCookie, origin: config.PUBLIC_BASE_URL },
     });
     assert.equal(logout.statusCode, 200);
-    assert.match(String(logout.headers["set-cookie"]), /^__Host-commentdm_session=/);
+    assert.match(String(logout.headers["set-cookie"]), /^__Host-instdm_session=/);
   } finally {
     await app.close();
   }

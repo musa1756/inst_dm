@@ -3,12 +3,12 @@ set -Eeuo pipefail
 
 umask 077
 
-PROJECT_DIR="${COMMENTDM_PROJECT_DIR:-/opt/comment-to-dm}"
-REPOSITORY_URL="${COMMENTDM_REPOSITORY_URL:-https://github.com/xvn3x/comment-to-dm.git}"
+PROJECT_DIR="${INSTDM_PROJECT_DIR:-/opt/inst_dm}"
+REPOSITORY_URL="${INSTDM_REPOSITORY_URL:-https://github.com/musa1756/inst_dm.git}"
 ref="${1:-}"
 
 if [[ "${EUID:-$(id -u)}" -ne 0 ]]; then
-  echo "Запустите обновление через sudo: sudo /opt/comment-to-dm/scripts/update-vps.sh" >&2
+  echo "Запустите обновление через sudo: sudo /opt/inst_dm/scripts/update-vps.sh" >&2
   exit 1
 fi
 
@@ -18,16 +18,16 @@ if [[ ! -f "$PROJECT_DIR/.env" ]]; then
 fi
 
 if [[ -z "$ref" ]]; then
-  echo "Укажите проверенный тег релиза, например: $0 v0.8.2" >&2
+  echo "Укажите проверенный тег релиза, например: $0 v0.1.0" >&2
   exit 2
 fi
 
 if [[ ! "$ref" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9]+)*$ ]]; then
-  echo "Обновление принимает только тег релиза вида v0.8.2, а не плавающую ветку: $ref" >&2
+  echo "Обновление принимает только тег релиза вида v0.1.0, а не плавающую ветку: $ref" >&2
   exit 2
 fi
 
-work_dir="$(mktemp -d /tmp/comment-to-dm-update-XXXXXX)"
+work_dir="$(mktemp -d /tmp/inst_dm-update-XXXXXX)"
 cleanup() {
   rm -rf -- "$work_dir"
 }
@@ -39,7 +39,7 @@ if [[ "$(git -C "$work_dir/source" cat-file -t "refs/tags/$ref" 2>/dev/null || t
   exit 3
 fi
 release_id="$(git -C "$work_dir/source" rev-parse HEAD)"
-archive_path="$PROJECT_DIR/incoming/comment-to-dm-${release_id}.tar.gz"
+archive_path="$PROJECT_DIR/incoming/inst_dm-${release_id}.tar.gz"
 
 git -C "$work_dir/source" archive --format=tar.gz --output="$archive_path" HEAD
 chown "$(stat -c '%U:%G' "$PROJECT_DIR")" "$archive_path"

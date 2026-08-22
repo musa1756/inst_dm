@@ -1,4 +1,4 @@
-# Protocol for an AI assistant installing Comment to DM
+# Protocol for an AI assistant installing Inst DM
 
 This document is written for Codex, Claude Code, and other coding agents. The human may have no technical experience. Do not merely summarize this file: lead the human through it one step at a time and verify every completed stage.
 
@@ -6,6 +6,7 @@ This document is written for Codex, Claude Code, and other coding agents. The hu
 
 A single-owner installation on a foreign Ubuntu 24.04 VPS:
 
+- a custom domain owned by the operator, with an A record pointing to the VPS;
 - application and embedded worker in Docker;
 - PostgreSQL accessible only inside the Docker network;
 - HTTPS through Caddy;
@@ -19,7 +20,7 @@ The current release supports one Instagram account per installation. This is not
 
 1. Never ask the human to send a root password, SSH private key, Meta App Secret, access token, Instagram password, `.env`, or backup through chat.
 2. Never use Instagram cookies, scraping, browser automation to imitate the API, or unofficial libraries.
-3. Never run the installer over an existing `/opt/comment-to-dm/.env`.
+3. Never run the installer over an existing `/opt/inst_dm/.env`.
 4. Never delete or rebuild a VPS until the human has identified the exact server and explicitly confirmed data loss.
 5. Do not expose port 5432. Only the existing SSH port, TCP 80, and TCP 443 are needed. UDP 443 is optional.
 6. Do not put production secrets into Git, commands that will be recorded in shared logs, screenshots, or issue reports.
@@ -45,6 +46,7 @@ Establish these facts without requesting secrets:
 5. The human can open the provider console or already has an SSH session.
 6. Provider firewall allows the existing SSH port plus TCP 80 and 443.
 7. The Instagram account is Professional: Creator or Business.
+8. The human owns a domain or subdomain whose A record resolves to this VPS. Do not continue while DNS points elsewhere.
 
 If terminal access is available, inspect read-only first:
 
@@ -64,18 +66,18 @@ If the agent has an authorized terminal, perform these commands. Otherwise show 
 ```bash
 sudo apt update
 sudo apt install -y git
-git clone --depth 1 --branch v0.8.2 https://github.com/xvn3x/comment-to-dm.git /tmp/comment-to-dm
-cd /tmp/comment-to-dm
-sudo bash scripts/install-vps.sh PUBLIC_IP
+git clone --depth 1 --branch v0.1.0 https://github.com/musa1756/inst_dm.git /tmp/inst_dm
+cd /tmp/inst_dm
+sudo bash scripts/install-vps.sh dm.example.com 203.0.113.10
 ```
 
-Replace `PUBLIC_IP` with the server's public IPv4. If the human owns a domain already pointed to the server, it may be used instead. Do not require a paid domain: an IP becomes a free hostname such as `203-0-113-10.sslip.io`.
+Replace `dm.example.com` with the human's own domain and `203.0.113.10` with that VPS's public IPv4. The installer requires both and verifies that the A record contains the expected address. It intentionally refuses a raw IP in place of the domain; do not bypass that check with a third-party wildcard hostname.
 
 The installer intentionally:
 
 - refuses to overwrite an existing installation;
 - installs Docker from Ubuntu 24.04 packages;
-- creates `/opt/comment-to-dm` and a dedicated non-login `commentdm` service user; its Docker-group access is root-equivalent and is used only by the backup service;
+- creates `/opt/inst_dm` and a dedicated non-login `instdm` service user; its Docker-group access is root-equivalent and is used only by the backup service;
 - generates independent admin, session, encryption, webhook, database secrets;
 - starts PostgreSQL, the application, worker, and Caddy;
 - waits for `/ready`;
@@ -83,18 +85,18 @@ The installer intentionally:
 
 The admin password appears once. Tell the human to save it locally in a password manager. Do not ask them to send it back.
 
-After installation, recommend SSH-key-only access. Make the change only if the human explicitly agrees and a second key-authenticated session has already been verified. The reviewed policy is `deploy/ssh/99-comment-to-dm-hardening.conf`; install it into `/etc/ssh/sshd_config.d/`, run `sshd -t`, reload SSH, then verify a new independent session before closing the provider console.
+After installation, recommend SSH-key-only access. Make the change only if the human explicitly agrees and a second key-authenticated session has already been verified. The reviewed policy is `deploy/ssh/99-inst_dm-hardening.conf`; install it into `/etc/ssh/sshd_config.d/`, run `sshd -t`, reload SSH, then verify a new independent session before closing the provider console.
 
 ## Phase 3 — verify the server
 
 Use read-only checks:
 
 ```bash
-cd /opt/comment-to-dm
+cd /opt/inst_dm
 sudo docker compose ps
 sudo docker compose exec -T app node -e 'fetch("http://127.0.0.1:3000/ready").then(async r => { console.log(await r.text()); process.exit(r.ok ? 0 : 1) })'
-sudo systemctl status comment-to-dm-backup.timer --no-pager
-sudo ls -lh /var/backups/comment-to-dm
+sudo systemctl status inst_dm-backup.timer --no-pager
+sudo ls -lh /var/backups/inst_dm
 ```
 
 Expected `/ready` response:
@@ -107,7 +109,7 @@ Open the HTTPS URL printed by the installer and let the human enter the admin pa
 
 ## Phase 4 — guide Meta setup
 
-The exact Meta dashboard labels may vary. Work from the values shown in Comment to DM's **Connection / Подключение** screen, not from guessed URLs.
+The exact Meta dashboard labels may vary. Work from the values shown in Inst DM's **Connection / Подключение** screen, not from guessed URLs.
 
 Guide the human through:
 
@@ -118,7 +120,7 @@ Guide the human through:
    - `instagram_business_manage_comments`;
    - `instagram_business_manage_messages`.
 4. Add the Instagram account as an Instagram Tester and have the human accept the invite inside the correct Instagram mobile account.
-5. Copy from Comment to DM into Meta:
+5. Copy from Inst DM into Meta:
    - OAuth callback;
    - Deauthorization callback;
    - Data deletion request URL;
@@ -127,7 +129,7 @@ Guide the human through:
    - masked Webhook verification token using its copy button.
 6. Subscribe webhooks at minimum to `comments`, `messages`, and `messaging_postbacks`.
 7. If Meta explicitly requires Live/Published status for real webhooks, guide the human through the requirements shown in their dashboard. Do not claim review is universally unnecessary; app roles/testers and public third-party accounts are treated differently by Meta.
-8. Let the human copy App ID and App Secret directly between Meta and their own Comment to DM panel. Do not receive the values yourself unless the agent is operating locally in their trusted browser and the human explicitly asked it to fill the form.
+8. Let the human copy App ID and App Secret directly between Meta and their own Inst DM panel. Do not receive the values yourself unless the agent is operating locally in their trusted browser and the human explicitly asked it to fill the form.
 9. The human completes Instagram OAuth and consent on the official Meta/Instagram page.
 
 Facebook Page is not required for the Instagram Login flow used by this project. The Instagram account must be Creator or Business.
@@ -155,7 +157,7 @@ Explain to the human:
 Update command after a release announcement:
 
 ```bash
-sudo /opt/comment-to-dm/scripts/update-vps.sh vX.Y.Z
+sudo /opt/inst_dm/scripts/update-vps.sh vX.Y.Z
 ```
 
 The update creates a backup, builds separately, checks `/ready`, and rolls back the app image on failure.

@@ -7,7 +7,7 @@ function productionEnv(overrides: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   return {
     NODE_ENV: "production",
     PUBLIC_BASE_URL: "https://comment.example.com",
-    DATABASE_URL: `postgres://commentdm:${randomBytes(24).toString("base64url")}@db:5432/commentdm`,
+    DATABASE_URL: `postgres://instdm:${randomBytes(24).toString("base64url")}@db:5432/instdm`,
     ADMIN_PASSWORD: randomBytes(18).toString("base64url"),
     SESSION_SECRET: randomBytes(48).toString("base64url"),
     ENCRYPTION_KEY: randomBytes(32).toString("base64"),
@@ -27,7 +27,7 @@ test("production refuses weak credentials, invalid encryption keys and mock mode
   assert.throws(() => loadConfig(productionEnv({ SESSION_SECRET: "x".repeat(32) })), /secrets/i);
   assert.throws(() => loadConfig(productionEnv({ ENCRYPTION_KEY: "x".repeat(44) })), /secrets/i);
   assert.throws(() => loadConfig(productionEnv({
-    DATABASE_URL: "postgres://commentdm:commentdm@db:5432/commentdm",
+    DATABASE_URL: "postgres://instdm:instdm@db:5432/instdm",
   })), /secrets/i);
   assert.throws(() => loadConfig(productionEnv({ META_MODE: "mock" })), /META_MODE/i);
 });

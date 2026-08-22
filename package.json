@@ -1,8 +1,8 @@
 {
-  "name": "comment-to-dm",
-  "version": "0.8.2",
+  "name": "inst_dm",
+  "version": "0.1.0",
   "private": true,
-  "description": "Self-hosted Instagram comment-to-DM automation for one professional account",
+  "description": "Independent self-hosted Instagram comment and Direct automation",
   "type": "module",
   "engines": {
     "node": ">=22"

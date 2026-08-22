@@ -149,7 +149,7 @@ export async function buildApp(sql: Db, config: AppConfig) {
   const box = new SecretBox(config.ENCRYPTION_KEY);
   const meta = new MetaClient(config);
   const passwordHash = hashPassword(config.ADMIN_PASSWORD);
-  const cookieName = config.NODE_ENV === "production" ? "__Host-commentdm_session" : "commentdm_session";
+  const cookieName = config.NODE_ENV === "production" ? "__Host-instdm_session" : "instdm_session";
 
   await app.register(cookie);
   await app.register(helmet, {

@@ -1,14 +1,14 @@
-# Comment to DM — контекст и правила работы для Claude
+# Inst DM — контекст и правила работы для Claude
 
 Прочитай этот файл целиком **до любых правок**, затем изучи текущий diff, `README.md`, `SECURITY.md` и непосредственно затрагиваемые файлы. Этот файл — постоянная инструкция проекта. Если пользователь просит новую задачу, сначала кратко перескажи, какие ограничения из этого документа относятся к ней, и только потом предложи план.
 
 ## 1. Что это за продукт
 
-Comment to DM — self-hosted приложение для автоматизаций одного Instagram Professional Account. Владелец разворачивает собственную копию, создаёт собственное приложение Meta, подключает Instagram официальным OAuth и хранит все секреты и данные на своём сервере.
+Inst DM — self-hosted приложение для автоматизаций одного Instagram Professional Account. Владелец разворачивает собственную копию, создаёт собственное приложение Meta, подключает Instagram официальным OAuth и хранит все секреты и данные на своём сервере.
 
 Главная ценность продукта: простой, понятный и надёжный аналог небольшой части ManyChat без ежемесячной подписки и без многопользовательского SaaS.
 
-Текущая версия: `0.8.2`.
+Текущая версия: `0.1.0`.
 
 ## Запросы на установку
 
@@ -65,7 +65,7 @@ Comment to DM — self-hosted приложение для автоматизац
 - Database: PostgreSQL через пакет `postgres`.
 - Worker: встроенный процесс очереди; leader lease не допускает параллельную отправку одного аккаунта несколькими репликами.
 - Production: Docker Compose + Caddy + PostgreSQL на отдельном VPS.
-- Railway остаётся только поддерживаемой альтернативой для самостоятельного развёртывания; текущая production-установка на Railway удалена.
+- Production-путь: собственный зарубежный Ubuntu 24.04 VPS и собственный домен. Другие платформы не входят в поддерживаемый сценарий этого репозитория.
 
 Ключевые файлы:
 
@@ -169,7 +169,7 @@ Comment to DM — self-hosted приложение для автоматизац
 - Секреты всегда шифруются `SecretBox`; не логировать их и не отдавать клиенту.
 - Подпись webhook и signed callbacks Meta всегда проверяется.
 - Не хранить текст входящих комментариев и Direct в журнале.
-- Миграции БД должны быть additive и безопасными для уже работающей Railway БД.
+- Миграции БД должны быть additive и безопасными для уже работающей PostgreSQL БД на VPS.
 - Нельзя удалять столбцы/таблицы или менять смысл существующих статусов без отдельного migration plan.
 - Не увеличивать число worker-реплик для ускорения одного аккаунта: лимит Meta общий.
 - Не заявлять конкретный безопасный лимит сообщений, если Meta его официально не гарантирует.
@@ -215,8 +215,8 @@ bash tests/backup-archive.test.sh
 Для изменений схемы/очереди также, и только на отдельной одноразовой базе:
 
 ```bash
-ALLOW_DESTRUCTIVE_TEST_DB=1 INTEGRATION_DATABASE_URL=postgres://USER@127.0.0.1:5432/comment_to_dm_test npm run test:migration
-ALLOW_DESTRUCTIVE_TEST_DB=1 INTEGRATION_DATABASE_URL=postgres://USER@127.0.0.1:5432/comment_to_dm_integration npm run test:integration
+ALLOW_DESTRUCTIVE_TEST_DB=1 INTEGRATION_DATABASE_URL=postgres://USER@127.0.0.1:5432/inst_dm_test npm run test:migration
+ALLOW_DESTRUCTIVE_TEST_DB=1 INTEGRATION_DATABASE_URL=postgres://USER@127.0.0.1:5432/inst_dm_integration npm run test:integration
 ```
 
 `test:integration` очищает таблицы, `test:migration` выполняет `DROP SCHEMA public CASCADE`. Guard в `scripts/test-db-guard.mjs` не даст запустить их без `ALLOW_DESTRUCTIVE_TEST_DB=1`, без `INTEGRATION_DATABASE_URL`, на базе без `test`/`integration` в имени и на базе, совпадающей с `DATABASE_URL`. Лиза worker сбрасывается самим тестом внутри одноразовой базы — рабочую базу для этого править нельзя.
@@ -258,7 +258,7 @@ npm run test:burst -- http://127.0.0.1:3000 5000 25
 
 ## 12. Deployment
 
-Production размещён на отдельном HOSTKEY VPS. Его адрес, SSH-реквизиты и runtime secrets не должны появляться в публичном репозитории, issue, логах или документации.
+Каждая production-установка размещена на отдельном VPS владельца. Адрес сервера, SSH-реквизиты и runtime secrets не должны появляться в публичном репозитории, issue, логах или документации.
 
 Перед push:
 

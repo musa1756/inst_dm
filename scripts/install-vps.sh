@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 umask 077
 
-PROJECT_DIR="${COMMENTDM_PROJECT_DIR:-/opt/comment-to-dm}"
-BACKUP_DIR="${COMMENTDM_BACKUP_DIR:-/var/backups/comment-to-dm}"
-APP_USER="${COMMENTDM_APP_USER:-commentdm}"
+PROJECT_DIR="${INSTDM_PROJECT_DIR:-/opt/inst_dm}"
+BACKUP_DIR="${INSTDM_BACKUP_DIR:-/var/backups/inst_dm}"
+APP_USER="${INSTDM_APP_USER:-instdm}"
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 fail() {
@@ -39,35 +39,55 @@ normalize_host() {
   raw="${raw%.}"
 
   if [[ "$raw" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
-    local part
-    IFS='.' read -r -a parts <<< "$raw"
-    for part in "${parts[@]}"; do
-      (( part >= 0 && part <= 255 )) || fail "неверный IPv4-адрес: $raw"
-    done
-    printf '%s.sslip.io\n' "${raw//./-}"
-    return
+    fail "укажите собственный домен, а не IP-адрес (например, dm.example.com)"
   fi
 
   if [[ ! "$raw" =~ ^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$ || "$raw" != *.* ]]; then
-    fail "укажите публичный IPv4-адрес или доменное имя"
+    fail "укажите доменное имя, например dm.example.com"
   fi
   printf '%s\n' "${raw,,}"
+}
+
+validate_ipv4() {
+  local raw="$1"
+  local part
+  local -a parts
+  [[ "$raw" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] || fail "неверный публичный IPv4: $raw"
+  IFS='.' read -r -a parts <<< "$raw"
+  for part in "${parts[@]}"; do
+    (( part >= 0 && part <= 255 )) || fail "неверный публичный IPv4: $raw"
+  done
 }
 
 host_input="${1:-}"
 if [[ -z "$host_input" ]]; then
   if [[ ! -t 0 ]]; then
-    fail "передайте публичный IP первым аргументом"
+    fail "передайте домен первым аргументом, например: sudo bash scripts/install-vps.sh dm.example.com"
   fi
-  echo "Введите публичный IPv4-адрес VPS (например, 203.0.113.10)."
-  echo "Если у вас уже есть домен, можно указать его вместо IP."
+  echo "Введите домен, A-запись которого уже указывает на этот VPS (например, dm.example.com)."
   read -r -p "> " host_input
 fi
 
 APP_DOMAIN="$(normalize_host "$host_input")"
+expected_ipv4="${2:-}"
+if [[ -z "$expected_ipv4" ]]; then
+  if [[ ! -t 0 ]]; then
+    fail "передайте публичный IPv4 VPS вторым аргументом"
+  fi
+  echo "Введите публичный IPv4 этого VPS, чтобы проверить DNS."
+  read -r -p "> " expected_ipv4
+fi
+validate_ipv4 "$expected_ipv4"
+
+cpu_count="$(nproc)"
+memory_kib="$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)"
+disk_kib="$(df -Pk / | awk 'NR == 2 { print $4 }')"
+(( cpu_count >= 2 )) || fail "нужно минимум 2 vCPU; найдено: $cpu_count"
+(( memory_kib >= 1800000 )) || fail "нужно минимум 2 ГБ RAM"
+(( disk_kib >= 26214400 )) || fail "нужно минимум 25 ГБ свободного места на диске"
 
 echo
-echo "Comment to DM будет доступен по адресу: https://$APP_DOMAIN"
+echo "Inst DM будет доступен по адресу: https://$APP_DOMAIN"
 echo "Устанавливаю Docker, приложение, HTTPS и ежедневные резервные копии."
 echo
 
@@ -75,6 +95,15 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y ca-certificates curl git docker.io docker-compose-v2 unattended-upgrades
 systemctl enable --now docker
+
+resolved_ipv4="$(getent ahostsv4 "$APP_DOMAIN" | awk '{ print $1 }' | sort -u | paste -sd, -)"
+if [[ -z "$resolved_ipv4" ]]; then
+  fail "домен $APP_DOMAIN ещё не имеет доступной A-записи. Настройте DNS и повторите установку"
+fi
+if ! tr ',' '\n' <<< "$resolved_ipv4" | grep -Fqx "$expected_ipv4"; then
+  fail "A-запись $APP_DOMAIN указывает на $resolved_ipv4, а ожидается IP этого VPS: $expected_ipv4"
+fi
+echo "DNS проверен: $APP_DOMAIN -> $resolved_ipv4"
 
 if ! id "$APP_USER" >/dev/null 2>&1; then
   useradd --system --create-home --home-dir "/var/lib/$APP_USER" --shell /usr/sbin/nologin "$APP_USER"
@@ -129,11 +158,11 @@ if (( ready != 1 )); then
 fi
 
 install -d -m 0700 -o "$APP_USER" -g "$APP_USER" "$BACKUP_DIR"
-install -m 0644 "$PROJECT_DIR/deploy/systemd/comment-to-dm-backup.service" /etc/systemd/system/
-install -m 0644 "$PROJECT_DIR/deploy/systemd/comment-to-dm-backup.timer" /etc/systemd/system/
+install -m 0644 "$PROJECT_DIR/deploy/systemd/inst_dm-backup.service" /etc/systemd/system/
+install -m 0644 "$PROJECT_DIR/deploy/systemd/inst_dm-backup.timer" /etc/systemd/system/
 systemctl daemon-reload
-systemctl enable --now comment-to-dm-backup.timer
-systemctl start comment-to-dm-backup.service
+systemctl enable --now inst_dm-backup.timer
+systemctl start inst_dm-backup.service
 
 echo
 echo "Установка завершена."

@@ -1,15 +1,15 @@
 [Unit]
-Description=Create a verified Comment to DM backup
+Description=Create a verified Inst DM backup
 Requires=docker.service
 After=docker.service
 
 [Service]
 Type=oneshot
-User=commentdm
-Group=commentdm
+User=instdm
+Group=instdm
 SupplementaryGroups=docker
 Environment=HOME=/tmp
-ExecStart=/opt/comment-to-dm/scripts/backup.sh scheduled
+ExecStart=/opt/inst_dm/scripts/backup.sh scheduled
 UMask=0077
 Nice=10
 IOSchedulingClass=best-effort

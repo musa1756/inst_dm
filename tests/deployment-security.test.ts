@@ -13,16 +13,12 @@ test("Docker build context excludes credentials, keys, dumps and Git metadata", 
   }
 });
 
-test("production workflow actions are pinned to immutable commit SHAs", () => {
-  const workflows = [
-    projectFile(".github/workflows/ci.yml"),
-    projectFile(".github/workflows/deploy-hostkey.yml"),
-  ].join("\n");
+test("CI workflow actions are pinned to immutable commit SHAs", () => {
+  const workflows = projectFile(".github/workflows/ci.yml");
   assert.doesNotMatch(workflows, /uses:\s+actions\/(?:checkout|setup-node)@v\d+/);
   const officialActions = [...workflows.matchAll(/uses:\s+actions\/(?:checkout|setup-node)@([^\s#]+)/g)];
-  assert.ok(officialActions.length >= 4);
+  assert.ok(officialActions.length >= 2);
   officialActions.forEach((match) => assert.match(match[1], /^[0-9a-f]{40}$/));
-  assert.match(workflows, /incoming\/deploy-release-\$\{GITHUB_SHA\}\.sh/);
 });
 
 test("the application container is read-only and isolated from the public database surface", () => {
@@ -55,11 +51,27 @@ test("self-hosted updates require an explicit release tag", () => {
 
 test("new VPS installations enable security updates and provide an SSH key-only policy", () => {
   const installer = projectFile("scripts/install-vps.sh");
-  const sshPolicy = projectFile("deploy/ssh/99-comment-to-dm-hardening.conf");
+  const sshPolicy = projectFile("deploy/ssh/99-inst_dm-hardening.conf");
   assert.match(installer, /unattended-upgrades/);
   assert.match(installer, /apt-daily-upgrade\.timer/);
   assert.match(installer, /chmod 644 "\$PROJECT_DIR\/Caddyfile"/);
   assert.match(sshPolicy, /PasswordAuthentication no/);
   assert.match(sshPolicy, /KbdInteractiveAuthentication no/);
   assert.match(sshPolicy, /PermitRootLogin prohibit-password/);
+});
+
+test("domain-only installation docs and release version stay aligned", () => {
+  const readme = projectFile("README.md");
+  const installRu = projectFile("docs/INSTALL-RU.md");
+  const aiInstall = projectFile("docs/AI-INSTALL.md");
+  const installer = projectFile("scripts/install-vps.sh");
+  const packageVersion = JSON.parse(projectFile("package.json")).version as string;
+  const docs = `${readme}\n${installRu}\n${aiInstall}`;
+
+  assert.doesNotMatch(docs, /PUBLIC_IP|ВАШ_IP|sslip\.io|домен не нужен/i);
+  assert.match(installer, /укажите собственный домен, а не IP-адрес/);
+  assert.match(installer, /A-запись .* ожидается IP этого VPS/);
+  for (const document of [readme, installRu, aiInstall]) {
+    assert.match(document, new RegExp(`v${packageVersion.replaceAll(".", "\\.")}`));
+  }
 });

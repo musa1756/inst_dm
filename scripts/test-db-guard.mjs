@@ -71,8 +71,8 @@ export function requireDisposableDatabase({ variable, command }) {
   });
   if (result.ok) return { url, name: result.identity.name };
 
-  const example = `  createdb comment_to_dm_test\n`
-    + `  ALLOW_DESTRUCTIVE_TEST_DB=1 ${variable}=postgres://USER@127.0.0.1:5432/comment_to_dm_test ${command}`;
+  const example = `  createdb inst_dm_test\n`
+    + `  ALLOW_DESTRUCTIVE_TEST_DB=1 ${variable}=postgres://USER@127.0.0.1:5432/inst_dm_test ${command}`;
   const reason = result.code === "missing_url"
     ? `переменная ${variable} не задана. Тест удаляет данные и работает только на одноразовой базе.`
     : result.message;

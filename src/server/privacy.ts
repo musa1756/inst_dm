@@ -5,7 +5,7 @@ export function privacyPolicyHtml(): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="index,follow">
-  <title>Privacy Policy — Comment to DM</title>
+  <title>Privacy Policy — Inst DM</title>
   <style>
     :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #17151f; background: #f6f5fa; }
     * { box-sizing: border-box; }
@@ -25,11 +25,11 @@ export function privacyPolicyHtml(): string {
 </head>
 <body>
   <main>
-    <p class="eyebrow">Comment to DM</p>
+    <p class="eyebrow">Inst DM</p>
     <h1>Privacy Policy</h1>
     <p class="updated">Effective date: August 18, 2026</p>
 
-    <p class="notice"><strong>Comment to DM is self-hosted.</strong> Each installation is operated independently. The open-source project author does not receive or have access to the Instagram data processed by an installation.</p>
+    <p class="notice"><strong>Inst DM is self-hosted.</strong> Each installation is operated independently. The open-source project author does not receive or have access to the Instagram data processed by an installation.</p>
 
     <h2>1. Who controls the data</h2>
     <p>The person or organization operating this installation is the data controller. Privacy requests should be sent to that operator using the contact information associated with its Meta application.</p>
@@ -57,7 +57,7 @@ export function privacyPolicyHtml(): string {
     <p>Delivery events are automatically removed after 30 days. OAuth state values expire after ten minutes. Account credentials remain until they expire, the account is disconnected, or a valid deletion request is processed.</p>
 
     <h2>6. Deletion and account disconnection</h2>
-    <p>The operator can disconnect Instagram from the Comment to DM dashboard. Instagram users can also remove the application's access in Instagram settings. A valid Meta data-deletion request removes queued jobs, delivery events, automation rules, the stored access token and connected-account details from this installation.</p>
+    <p>The operator can disconnect Instagram from the Inst DM dashboard. Instagram users can also remove the application's access in Instagram settings. A valid Meta data-deletion request removes queued jobs, delivery events, automation rules, the stored access token and connected-account details from this installation.</p>
 
     <h2>7. Security</h2>
     <p>The application uses HTTPS, encrypted secret storage, signed sessions, webhook signature verification and limited administrative access. No internet-connected system can be guaranteed completely secure, so operators must also protect their hosting account, database and administrator password.</p>
@@ -68,7 +68,7 @@ export function privacyPolicyHtml(): string {
     <h2>9. Changes</h2>
     <p>This policy may be updated when the application's data practices change. The effective date at the top of this page identifies the current version.</p>
 
-    <footer>Comment to DM · Self-hosted Instagram automation</footer>
+    <footer>Inst DM · Self-hosted Instagram automation</footer>
   </main>
 </body>
 </html>`;

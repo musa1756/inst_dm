@@ -611,7 +611,7 @@ export function App() {
 
   if (!authenticated) return <main className="login-page">
     <div className="login-toolbar"><button className="icon-button" onClick={() => setLanguage(language === "ru" ? "en" : "ru")} aria-label="Language"><Languages size={19} /><span>{language.toUpperCase()}</span></button><button className="icon-button" onClick={() => setTheme(theme === "light" ? "dark" : "light")} aria-label="Theme">{theme === "light" ? <Moon size={19} /> : <Sun size={19} />}</button></div>
-    <section className="login-card"><BrandIcon large /><p className="kicker">COMMENT TO DM · {t.selfHosted.toUpperCase()}</p><h1>{t.loginTitle}</h1><p className="lead">{t.loginText}</p>
+    <section className="login-card"><BrandIcon large /><p className="kicker">INST DM · {t.selfHosted.toUpperCase()}</p><h1>{t.loginTitle}</h1><p className="lead">{t.loginText}</p>
       <div className="trust-row"><span><ShieldCheck />{t.selfHosted}</span><span><LockKeyhole />{t.encrypted}</span><span><Camera />{t.officialApi}</span></div>
       <form onSubmit={login} className="login-form"><label>{t.password}<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoFocus autoComplete="current-password" /></label>{error && <div className="inline-error"><CircleAlert />{error}</div>}<button className="button primary wide" disabled={busy}>{busy ? `${t.login}…` : t.login}<ChevronRight /></button></form>
     </section>
@@ -620,7 +620,7 @@ export function App() {
   function navigate(next: Exclude<Screen, "rule">) { setScreen(next); setSelectedEvent(null); window.scrollTo({ top: 0, behavior: "smooth" }); }
 
   return <div className="app-shell">
-    <header className="topbar"><div className="topbar-main"><button className="brand-button" onClick={() => navigate("automations")}><BrandIcon /><strong>Comment to DM</strong></button><div className="topbar-tools">
+    <header className="topbar"><div className="topbar-main"><button className="brand-button" onClick={() => navigate("automations")}><BrandIcon /><strong>Inst DM</strong></button><div className="topbar-tools">
       <button type="button" className="topbar-icon" onClick={() => setLanguage(language === "ru" ? "en" : "ru")}
         aria-label={`${t.language}: ${language === "ru" ? "Русский" : "English"}`}><Languages /><span>{language.toUpperCase()}</span></button>
       <button type="button" className="topbar-icon" onClick={() => setTheme(theme === "light" ? "dark" : "light")}

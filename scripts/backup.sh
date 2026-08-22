@@ -3,9 +3,9 @@ set -Eeuo pipefail
 
 umask 077
 
-PROJECT_DIR="${COMMENTDM_PROJECT_DIR:-/opt/comment-to-dm}"
-BACKUP_DIR="${COMMENTDM_BACKUP_DIR:-/var/backups/comment-to-dm}"
-RETENTION_DAYS="${COMMENTDM_BACKUP_RETENTION_DAYS:-14}"
+PROJECT_DIR="${INSTDM_PROJECT_DIR:-/opt/inst_dm}"
+BACKUP_DIR="${INSTDM_BACKUP_DIR:-/var/backups/inst_dm}"
+RETENTION_DAYS="${INSTDM_BACKUP_RETENTION_DAYS:-14}"
 BACKUP_KIND="${1:-manual}"
 
 case "$BACKUP_KIND" in
@@ -17,12 +17,12 @@ case "$BACKUP_KIND" in
 esac
 
 if [[ ! "$RETENTION_DAYS" =~ ^[0-9]+$ ]] || (( RETENTION_DAYS < 1 || RETENTION_DAYS > 365 )); then
-  echo "COMMENTDM_BACKUP_RETENTION_DAYS must be between 1 and 365." >&2
+  echo "INSTDM_BACKUP_RETENTION_DAYS must be between 1 and 365." >&2
   exit 2
 fi
 
 if [[ ! -f "$PROJECT_DIR/docker-compose.yml" || ! -f "$PROJECT_DIR/.env" ]]; then
-  echo "Comment to DM installation was not found at $PROJECT_DIR." >&2
+  echo "Inst DM installation was not found at $PROJECT_DIR." >&2
   exit 2
 fi
 
@@ -39,12 +39,12 @@ esac
 
 exec 9>"$BACKUP_DIR/.backup.lock"
 if ! flock -n 9; then
-  echo "Another Comment to DM backup is already running." >&2
+  echo "Another Inst DM backup is already running." >&2
   exit 3
 fi
 
 timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
-archive_name="comment-to-dm-${BACKUP_KIND}-${timestamp}.tar.gz"
+archive_name="inst_dm-${BACKUP_KIND}-${timestamp}.tar.gz"
 archive_path="$BACKUP_DIR/$archive_name"
 partial_path="$BACKUP_DIR/.${archive_name}.partial"
 work_dir="$(mktemp -d "$BACKUP_DIR/.backup-${timestamp}-XXXXXX")"
@@ -89,7 +89,7 @@ chmod 600 "$archive_path"
 )
 
 find "$BACKUP_DIR" -maxdepth 1 -type f \
-  \( -name 'comment-to-dm-*.tar.gz' -o -name 'comment-to-dm-*.tar.gz.sha256' \) \
+  \( -name 'inst_dm-*.tar.gz' -o -name 'inst_dm-*.tar.gz.sha256' \) \
   -mtime "+$RETENTION_DAYS" -delete
 
 echo "$archive_path"

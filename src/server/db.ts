@@ -375,7 +375,7 @@ const migrations = [
 export async function createDb(databaseUrl: string): Promise<Db> {
   const sql = postgres(databaseUrl, { max: 8, idle_timeout: 20, connect_timeout: 15 });
   await sql.begin(async (tx) => {
-    await tx`SELECT pg_advisory_xact_lock(hashtext('commentdm-schema-migrations'))`;
+    await tx`SELECT pg_advisory_xact_lock(hashtext('instdm-schema-migrations'))`;
     const existing = await tx<{ present: boolean }[]>`
       SELECT to_regclass('public.meta_connection') IS NOT NULL AS present
     `;

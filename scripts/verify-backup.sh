@@ -3,15 +3,15 @@ set -Eeuo pipefail
 
 umask 077
 
-PROJECT_DIR="${COMMENTDM_PROJECT_DIR:-/opt/comment-to-dm}"
-BACKUP_DIR="${COMMENTDM_BACKUP_DIR:-/var/backups/comment-to-dm}"
+PROJECT_DIR="${INSTDM_PROJECT_DIR:-/opt/inst_dm}"
+BACKUP_DIR="${INSTDM_BACKUP_DIR:-/var/backups/inst_dm}"
 archive_path="${1:-}"
 
 # shellcheck disable=SC1091
 source "$PROJECT_DIR/scripts/backup-archive.sh"
 
 if [[ -z "$archive_path" ]]; then
-  archive_path="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'comment-to-dm-*.tar.gz' -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)"
+  archive_path="$(find "$BACKUP_DIR" -maxdepth 1 -type f -name 'inst_dm-*.tar.gz' -printf '%T@ %p\n' | sort -nr | head -n 1 | cut -d' ' -f2-)"
 fi
 
 if [[ -z "$archive_path" || ! -f "$archive_path" ]]; then
@@ -20,14 +20,14 @@ if [[ -z "$archive_path" || ! -f "$archive_path" ]]; then
 fi
 
 if [[ ! -f "$PROJECT_DIR/docker-compose.yml" ]]; then
-  echo "Comment to DM installation was not found at $PROJECT_DIR." >&2
+  echo "Inst DM installation was not found at $PROJECT_DIR." >&2
   exit 2
 fi
 
 archive_path="$(readlink -f "$archive_path")"
 checksum_path="$archive_path.sha256"
 work_dir="$(mktemp -d)"
-test_database="commentdm_backup_verify_$(date -u +%Y%m%d%H%M%S)_$$"
+test_database="instdm_backup_verify_$(date -u +%Y%m%d%H%M%S)_$$"
 database_created=0
 
 cleanup() {
@@ -47,7 +47,7 @@ if [[ -f "$checksum_path" ]]; then
   )
 fi
 
-extract_commentdm_backup "$archive_path" "$work_dir"
+extract_instdm_backup "$archive_path" "$work_dir"
 test -s "$work_dir/database.dump"
 test -s "$work_dir/production.env"
 

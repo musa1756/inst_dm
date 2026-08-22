@@ -3,19 +3,19 @@ set -Eeuo pipefail
 
 umask 077
 
-PROJECT_DIR="${COMMENTDM_PROJECT_DIR:-/opt/comment-to-dm}"
+PROJECT_DIR="${INSTDM_PROJECT_DIR:-/opt/inst_dm}"
 archive_path="${1:-}"
 
 # shellcheck disable=SC1091
 source "$PROJECT_DIR/scripts/backup-archive.sh"
 
 if [[ -z "$archive_path" || ! -f "$archive_path" ]]; then
-  echo "Usage: COMMENTDM_RESTORE_CONFIRM=RESTORE_COMMENT_TO_DM $0 /path/to/backup.tar.gz" >&2
+  echo "Usage: INSTDM_RESTORE_CONFIRM=RESTORE_INST_DM $0 /path/to/backup.tar.gz" >&2
   exit 2
 fi
 
-if [[ "${COMMENTDM_RESTORE_CONFIRM:-}" != "RESTORE_COMMENT_TO_DM" ]]; then
-  echo "Restore refused. Set COMMENTDM_RESTORE_CONFIRM=RESTORE_COMMENT_TO_DM after checking the archive path." >&2
+if [[ "${INSTDM_RESTORE_CONFIRM:-}" != "RESTORE_INST_DM" ]]; then
+  echo "Restore refused. Set INSTDM_RESTORE_CONFIRM=RESTORE_INST_DM after checking the archive path." >&2
   exit 3
 fi
 
@@ -29,7 +29,7 @@ trap cleanup EXIT
 
 "$PROJECT_DIR/scripts/verify-backup.sh" "$archive_path"
 pre_restore_archive="$("$PROJECT_DIR/scripts/backup.sh" pre-restore)"
-extract_commentdm_backup "$archive_path" "$work_dir"
+extract_instdm_backup "$archive_path" "$work_dir"
 
 cd "$PROJECT_DIR"
 docker compose stop app
@@ -44,7 +44,7 @@ docker compose exec -T db sh -lc \
   'pg_restore --username="$POSTGRES_USER" --dbname="$POSTGRES_DB" --exit-on-error --no-owner --no-privileges' \
   < "$work_dir/database.dump"
 
-if [[ "${COMMENTDM_RESTORE_ENV:-0}" == "1" ]]; then
+if [[ "${INSTDM_RESTORE_ENV:-0}" == "1" ]]; then
   install -m 600 "$work_dir/production.env" "$PROJECT_DIR/.env"
 fi
 

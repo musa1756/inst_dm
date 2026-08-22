@@ -7,7 +7,7 @@ if (existsSync(target)) {
   process.exit(1);
 }
 
-const domain = process.argv[2] || "comment.example.com";
+const domain = process.argv[2] || "dm.example.com";
 const adminPassword = randomBytes(18).toString("base64url");
 const sessionSecret = randomBytes(48).toString("base64url");
 const encryptionKey = randomBytes(32).toString("base64");

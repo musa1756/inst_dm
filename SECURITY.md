@@ -33,10 +33,10 @@ No self-hosted application can protect secrets from every administrator of the m
 
 1. Use Ubuntu security updates, SSH keys and a firewall that exposes only SSH, HTTP and HTTPS. Disable SSH password login after confirming key access.
 2. Protect the VPS provider account and GitHub account with unique passwords and MFA. Never share the deploy private key.
-3. Keep `/opt/comment-to-dm/.env` at mode `0600`; never paste it into chat, an issue, a screenshot or a repository.
-4. Keep `/var/backups/comment-to-dm` at mode `0700`. Store off-server copies only in an encrypted location and verify a recent backup before an update.
+3. Keep `/opt/inst_dm/.env` at mode `0600`; never paste it into chat, an issue, a screenshot or a repository.
+4. Keep `/var/backups/inst_dm` at mode `0700`. Store off-server copies only in an encrypted location and verify a recent backup before an update.
 5. Install and update from an announced `vX.Y.Z` release tag. Do not point `update-vps.sh` at a branch or an untrusted fork.
-6. Enter the Instagram password only on an official Meta/Instagram page. Comment to DM never needs it.
+6. Enter the Instagram password only on an official Meta/Instagram page. Inst DM never needs it.
 7. Revoke the Instagram authorization and rotate affected secrets immediately if `.env`, a backup, a session cookie, App Secret or token may have leaked.
 
 ## Automated checks
