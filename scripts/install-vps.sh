@@ -86,9 +86,9 @@ validate_ipv4 "$expected_ipv4"
 cpu_count="$(nproc)"
 memory_kib="$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)"
 disk_kib="$(df -Pk / | awk 'NR == 2 { print $4 }')"
-(( cpu_count >= 2 )) || fail "нужно минимум 2 vCPU; найдено: $cpu_count"
+(( cpu_count >= 1 )) || fail "нужен минимум 1 vCPU; найдено: $cpu_count"
 (( memory_kib >= 1800000 )) || fail "нужно минимум 2 ГБ RAM"
-(( disk_kib >= 26214400 )) || fail "нужно минимум 25 ГБ свободного места на диске"
+(( disk_kib >= 23068672 )) || fail "нужно минимум 22 ГБ свободного места на диске"
 
 echo
 echo "Inst DM будет доступен по адресу: https://$APP_DOMAIN"
@@ -108,6 +108,18 @@ if ! tr ',' '\n' <<< "$resolved_ipv4" | grep -Fqx "$expected_ipv4"; then
   fail "A-запись $APP_DOMAIN указывает на $resolved_ipv4, а ожидается IP этого VPS: $expected_ipv4"
 fi
 echo "DNS проверен: $APP_DOMAIN -> $resolved_ipv4"
+
+# На тарифах с 1 vCPU и 2 ГБ RAM сборка образа надёжно проходит только с подкачкой.
+if [[ -z "$(swapon --noheadings --show=NAME)" ]] && (( memory_kib < 3500000 )); then
+  if [[ ! -e /swapfile ]]; then
+    fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048 status=none
+    chmod 600 /swapfile
+    mkswap /swapfile >/dev/null
+  fi
+  swapon /swapfile || fail "не удалось включить /swapfile. Проверьте этот файл вручную и повторите установку"
+  grep -Eq '^/swapfile[[:space:]]' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  echo "Добавлен файл подкачки 2 ГБ: на небольшом VPS без него сборке может не хватить памяти."
+fi
 
 if ! id "$APP_USER" >/dev/null 2>&1; then
   useradd --system --create-home --home-dir "/var/lib/$APP_USER" --shell /usr/sbin/nologin "$APP_USER"

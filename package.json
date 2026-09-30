@@ -1,6 +1,6 @@
 {
   "name": "inst_dm",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Independent self-hosted Instagram comment and Direct automation",
   "type": "module",

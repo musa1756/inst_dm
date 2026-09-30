@@ -77,3 +77,27 @@ test("domain-only installation docs and release version stay aligned", () => {
     assert.match(document, /Ubuntu 24\.04[\s\S]*Ubuntu 26\.04/);
   }
 });
+
+test("the env generator replaces the placeholder domain that .env.example actually uses", () => {
+  const example = projectFile(".env.example");
+  const generator = projectFile("scripts/generate-env.mjs");
+  const placeholder = generator.match(/\.replaceAll\("([^"]+)", domain\)/)?.[1];
+  assert.ok(placeholder, "generate-env.mjs must substitute a placeholder domain");
+  const escaped = placeholder.replaceAll(".", "\\.");
+  assert.match(example, new RegExp(`^APP_DOMAIN=${escaped}$`, "m"));
+  assert.match(example, new RegExp(`^PUBLIC_BASE_URL=https://${escaped}$`, "m"));
+});
+
+test("small 1 vCPU / 2 GB VPS installs get a persistent swap file for the build", () => {
+  const installer = projectFile("scripts/install-vps.sh");
+  assert.match(installer, /cpu_count >= 1/);
+  assert.match(installer, /swapon --noheadings --show=NAME/);
+  assert.match(installer, /mkswap \/swapfile/);
+  assert.match(installer, /\/swapfile none swap sw 0 0/);
+});
+
+test("the README hands AI agents the raw install protocol", () => {
+  const readme = projectFile("README.md");
+  assert.match(readme, /https:\/\/raw\.githubusercontent\.com\/musa1756\/inst_dm\/main\/docs\/AI-INSTALL\.md/);
+  assert.ok(projectFile("docs/AI-INSTALL.md").length > 0);
+});
